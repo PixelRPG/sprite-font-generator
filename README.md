@@ -4,7 +4,7 @@ A straightforward tool designed to convert web fonts into sprite fonts. At prese
 
 ## Usage
 
-At the moment, we don't have a user interface in place. However, you can easily toggle between fonts using the Space key. Additionally, to activate the debug mode, simply press F1 on your keyboard. To save the sprite font, simply right-click on the canvas and select Save image as.... Please note that this functionality is confirmed to work in Chrome. In the future, we plan to introduce a dedicated user interface for this purpose.
+At the moment, we don't have a user interface in place. However, you can easily toggle between fonts using the arrow left and right keys. Additionally, to activate the debug mode, simply press F1 on your keyboard. To save the sprite font, simply right-click on the canvas and select Save image as.... Please note that this functionality is confirmed to work in Chrome. In the future, we plan to introduce a dedicated user interface for this purpose.
 
 ## Development
 

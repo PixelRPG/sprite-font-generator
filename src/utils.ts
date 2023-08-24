@@ -15,3 +15,7 @@ export const waitForFontLoad = async (font: string, timeout = 2000, interval = 1
     setTimeout(() => clearInterval(poller), timeout);
   });
 }
+
+export const replaceBreaksWithHtml = (input: string) => {
+  return input.replace(/\n/g, '<br>');
+}

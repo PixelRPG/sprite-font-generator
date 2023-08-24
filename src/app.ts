@@ -1,5 +1,6 @@
 import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color, KeyEvent, Keys, FontOptions, GraphicOptions, RasterOptions } from 'excalibur';
 import { waitForFontLoad } from './utils';
+import { addHTMLTextFonts } from './html'
 
 const loader = new Loader([]);
 
@@ -16,7 +17,7 @@ abcdefghijklmnopqrstuvwxyz
 ŵŶŷŸŹźŻżŽžƒǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛ
 ǜǝǞǟǠǡǢǣǸǹǼǽȞȟȲȳ‑‒–‘’‚‛“”„
 ‟․‥…‧‾⁋⁌⁍⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂
-₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ`
+₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ█`
 
 const engine = new Engine({
   antialiasing: false,
@@ -24,14 +25,15 @@ const engine = new Engine({
   suppressPlayButton: true,
   backgroundColor: Color.White,
   displayMode: DisplayMode.Fixed,
-  width: 600,
-  height: 800,
+  width: 300,
+  height: 300,
+  canvasElementId: 'canvas',
 });
 
 const baseFontOptions: FontOptions & GraphicOptions & RasterOptions = {
   unit: FontUnit.Px,
   quality: 1,
-  padding: 0,
+  padding: 1, // 1px padding for rounding errors?
   smoothing: false,
   style: FontStyle.Normal,
   bold: false,
@@ -116,7 +118,7 @@ for (const text of texts) {
 
 let activeFontIndex = -1;
 
-const switchFont = () => {
+const nextFont = () => {
   ++activeFontIndex;
   if (activeFontIndex >= texts.length) {
     activeFontIndex = 0;
@@ -128,7 +130,19 @@ const switchFont = () => {
   actor.graphics.use(family);
 }
 
-switchFont();
+const prevFont = () => {
+  --activeFontIndex;
+  if (activeFontIndex < 0) {
+    activeFontIndex = texts.length - 1;
+  }
+  const text = texts[activeFontIndex];
+  const family = (text.font as Font).family;
+  const size = (text.font as Font).size;
+  console.info(`Switching to font ${family} ${size}px`);
+  actor.graphics.use(family);
+}
+
+nextFont();
 
 engine.add(actor);
 
@@ -137,12 +151,19 @@ engine.input.keyboard.on("release", (evt: KeyEvent) => {
     case Keys.F1:
       engine.toggleDebug();
       break;
-    case Keys.Space:
-      switchFont();
+    case Keys.ArrowRight:
+      nextFont();
+      break;
+    case Keys.ArrowLeft:
+      prevFont();
       break;
     default:
       break;
   }
 });
 
+// Add HTML text fonts
+addHTMLTextFonts(unicodeText, texts);
+
+// Start canvas renderer
 await engine.start(loader)
