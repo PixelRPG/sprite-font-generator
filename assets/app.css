@@ -1,0 +1,14 @@
+@font-face {
+    font-family: "ark-pixel-10px-monospaced-latin";
+    src: url("./ark-pixel-10px-monospaced-latin.woff2");
+}
+
+@font-face {
+    font-family: "ark-pixel-12px-monospaced-latin";
+    src: url("./ark-pixel-12px-monospaced-latin.woff2");
+}
+
+@font-face {
+    font-family: "ark-pixel-16px-monospaced-latin";
+    src: url("./ark-pixel-16px-monospaced-latin.woff2");
+}
