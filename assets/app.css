@@ -1,14 +1,37 @@
+/* Ark Pixel */
 @font-face {
-    font-family: "ark-pixel-10px-monospaced-latin";
-    src: url("./ark-pixel-10px-monospaced-latin.woff2");
+    font-family: 'ark-pixel-10px-monospaced-latin';
+    src: url(./ark-pixel-10px-monospaced-latin.woff2) format("woff2");
 }
 
 @font-face {
-    font-family: "ark-pixel-12px-monospaced-latin";
-    src: url("./ark-pixel-12px-monospaced-latin.woff2");
+    font-family: 'ark-pixel-12px-monospaced-latin';
+    src: url(./ark-pixel-12px-monospaced-latin.woff2) format("woff2");
 }
 
 @font-face {
-    font-family: "ark-pixel-16px-monospaced-latin";
-    src: url("./ark-pixel-16px-monospaced-latin.woff2");
+    font-family: 'ark-pixel-16px-monospaced-latin';
+    src: url(./ark-pixel-16px-monospaced-latin.woff2) format("woff2");
+}
+
+/* Fusion Pixel */
+@font-face {
+    font-family: 'fusion-pixel-8px-monospaced-latin';
+    src: url(./fusion-pixel-8px-monospaced-latin.woff2) format("woff2");
+}
+
+@font-face {
+    font-family: 'fusion-pixel-10px-monospaced-latin';
+    src: url(./fusion-pixel-10px-monospaced-latin.woff2) format("woff2");
+}
+
+@font-face {
+    font-family: 'fusion-pixel-12px-monospaced-latin';
+    src: url(./fusion-pixel-12px-monospaced-latin.woff2) format("woff2");
+}
+
+/* Global */
+html, body {
+    padding: 0;
+    margin: 0;
 }

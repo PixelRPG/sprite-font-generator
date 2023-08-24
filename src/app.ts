@@ -3,7 +3,8 @@ import { waitForFontLoad } from './utils';
 
 const loader = new Loader([]);
 
-const unicodeText = `ABCDEFGHIJKLMNOPQRSTUVWXYZ
+const unicodeText =
+`ABCDEFGHIJKLMNOPQRSTUVWXYZ
 abcdefghijklmnopqrstuvwxyz
 0123456789 !"#$%&'()*+,-./
 :;<=>?@[\\]^_\`{|}~¡¢£¤¥¦§¨ª
@@ -15,8 +16,7 @@ abcdefghijklmnopqrstuvwxyz
 ŵŶŷŸŹźŻżŽžƒǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛ
 ǜǝǞǟǠǡǢǣǸǹǼǽȞȟȲȳ‑‒–‘’‚‛“”„
 ‟․‥…‧‾⁋⁌⁍⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂
-₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ█
-`
+₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ`
 
 const engine = new Engine({
   antialiasing: false,
@@ -42,6 +42,7 @@ const baseFontOptions: FontOptions & GraphicOptions & RasterOptions = {
 }
 
 const texts = [
+  // Ark Pixel
   new Text({
     text: unicodeText,
     font: new Font({
@@ -68,7 +69,36 @@ const texts = [
       family: 'ark-pixel-16px-monospaced-latin',
     }),
     maxWidth: engine.drawWidth,
-  })
+  }),
+
+  // Fusion Pixel
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 8,
+      family: 'fusion-pixel-8px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
+  }),
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 10,
+      family: 'fusion-pixel-10px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
+  }),
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 12,
+      family: 'fusion-pixel-12px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
+  }),
 ];
 
 
@@ -91,7 +121,11 @@ const switchFont = () => {
   if (activeFontIndex >= texts.length) {
     activeFontIndex = 0;
   }
-  actor.graphics.use((texts[activeFontIndex].font as Font).family);
+  const text = texts[activeFontIndex];
+  const family = (text.font as Font).family;
+  const size = (text.font as Font).size;
+  console.info(`Switching to font ${family} ${size}px`);
+  actor.graphics.use(family);
 }
 
 switchFont();

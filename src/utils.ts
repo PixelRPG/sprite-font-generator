@@ -2,6 +2,7 @@ export const waitForFontLoad = async (font: string, timeout = 2000, interval = 1
   return new Promise((resolve, reject) => {
     const poller = setInterval(async () => {
       try {
+        console.debug('Load font', font);
         await document.fonts.load(font);
       } catch (err) {
         reject(err);
