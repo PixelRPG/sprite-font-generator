@@ -1,4 +1,4 @@
-import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color } from 'excalibur';
+import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color, KeyEvent, Keys, FontOptions, GraphicOptions, RasterOptions } from 'excalibur';
 import { waitForFontLoad } from './utils';
 
 const loader = new Loader([]);
@@ -14,9 +14,8 @@ abcdefghijklmnopqrstuvwxyz
 ğĠġĨĩĪīĬĭŃńŇňŌōŎŏŔŕŨũŪūŬŭŴ
 ŵŶŷŸŹźŻżŽžƒǍǎǏǐǑǒǓǔǕǖǗǘǙǚǛ
 ǜǝǞǟǠǡǢǣǸǹǼǽȞȟȲȳ‑‒–‘’‚‛“”„
-‟․‥…‧※‾⁋⁌⁍⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀
-₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛ
-ₜ
+‟․‥…‧‾⁋⁌⁍⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂
+₃₄₅₆₇₈₉₊₋₌₍₎ₐₑₒₓₔₕₖₗₘₙₚₛₜ█
 `
 
 const engine = new Engine({
@@ -25,44 +24,91 @@ const engine = new Engine({
   suppressPlayButton: true,
   backgroundColor: Color.White,
   displayMode: DisplayMode.Fixed,
-  width: 200,
-  height: 400,
+  width: 600,
+  height: 800,
 });
 
-// engine.showDebug(true);
+const baseFontOptions: FontOptions & GraphicOptions & RasterOptions = {
+  unit: FontUnit.Px,
+  quality: 1,
+  padding: 0,
+  smoothing: false,
+  style: FontStyle.Normal,
+  bold: false,
+  textAlign: TextAlign.Left,
+  baseAlign: BaseAlign.Top,
+  direction: Direction.LeftToRight,
+  color: Color.Black,
+}
 
-const arkPixel16Text = new Text({
-  text: unicodeText,
-  font: new Font({
-    size: 10,
-    unit: FontUnit.Px,
-    quality: 1,
-    padding: 0,
-    smoothing: false,
-    family: 'ark-pixel-10px-monospaced-latin',
-    style: FontStyle.Normal,
-    bold: false,
-    textAlign: TextAlign.Left,
-    baseAlign: BaseAlign.Top,
-    direction: Direction.LeftToRight,
-    color: Color.Black,
+const texts = [
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 10,
+      family: 'ark-pixel-10px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
   }),
-  maxWidth: engine.drawWidth,
-});
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 12,
+      family: 'ark-pixel-12px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
+  }),
+  new Text({
+    text: unicodeText,
+    font: new Font({
+      ...baseFontOptions,
+      size: 16,
+      family: 'ark-pixel-16px-monospaced-latin',
+    }),
+    maxWidth: engine.drawWidth,
+  })
+];
 
 
 const actor = new ScreenElement({
   width: engine.drawWidth,
   height: engine.drawHeight,
 });
-actor.graphics.use(arkPixel16Text);
 
-// actor.graphics.offset = vec(0, 10); // Bug?
+for (const text of texts) {
+  const size = (text.font as Font).size
+  const family = (text.font as Font).family
+  await waitForFontLoad(`${size}px ${family}`); // e.g. '10px ark-pixel-10px-monospaced-latin'
+  actor.graphics.add(family, text);
+}
+
+let activeFontIndex = -1;
+
+const switchFont = () => {
+  ++activeFontIndex;
+  if (activeFontIndex >= texts.length) {
+    activeFontIndex = 0;
+  }
+  actor.graphics.use((texts[activeFontIndex].font as Font).family);
+}
+
+switchFont();
 
 engine.add(actor);
 
-await waitForFontLoad('10px ark-pixel-10px-monospaced-latin');
-await waitForFontLoad('12px ark-pixel-12px-monospaced-latin');
-await waitForFontLoad('16px ark-pixel-16px-monospaced-latin');
+engine.input.keyboard.on("release", (evt: KeyEvent) => {
+  switch (evt.key) {
+    case Keys.F1:
+      engine.toggleDebug();
+      break;
+    case Keys.Space:
+      switchFont();
+      break;
+    default:
+      break;
+  }
+});
 
 await engine.start(loader)
