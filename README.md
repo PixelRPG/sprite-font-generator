@@ -1,10 +1,9 @@
 # Sprite Font Generator
 
-A straightforward tool designed to convert web fonts into sprite fonts. At present, it only supports the [ark-pixel-font](https://github.com/TakWolf/ark-pixel-font) and [fusion-pixel-font](https://github.com/TakWolf/fusion-pixel-font). However, plans are underway to broaden its capabilities to encompass various web fonts in the near future.
-
+A straightforward tool designed to convert web fonts into sprite fonts. At present, it only supports [ark-pixel-font](https://github.com/TakWolf/ark-pixel-font).
 ## Usage
 
-At the moment, we don't have a user interface in place. However, you can easily toggle between fonts using the arrow left and right keys. Additionally, to activate the debug mode, simply press F1 on your keyboard. To save the sprite font, simply right-click on the canvas and select Save image as.... Please note that this functionality is confirmed to work in Chrome. In the future, we plan to introduce a dedicated user interface for this purpose.
+Choose a font from the dropdown and click the download button get download the sprite font.
 
 ## Development
 

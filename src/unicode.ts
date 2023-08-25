@@ -1,12 +1,8 @@
 /*
- * Source: https://github.com/glyphr-studio/Glyphr-Studio-2/blob/ad53a1b9c5f199287edc379d2eb4bfead703c845/src/lib/unicode_blocks.js#L1C1-L225C2
+ * Based on https://github.com/glyphr-studio/Glyphr-Studio-2/blob/ad53a1b9c5f199287edc379d2eb4bfead703c845/src/lib/unicode_blocks.js#L1C1-L225C2
  */
 
-export interface UnicodeBlock {
-    begin: number;
-    end: number;
-    name: string;
-}
+import type { UnicodeBlock } from './types';
 
 export const unicodeBlocks: UnicodeBlock[] = [
 	{ begin: 0x0000, end: 0x001f, name: 'Basic Latin Controls' },

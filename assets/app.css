@@ -23,31 +23,6 @@
     src: url(./ark-pixel-16px-monospaced-latin.woff2) format("woff2");
 }
 
-/* Fusion Pixel */
-@font-face {
-    font-family: 'fusion-pixel-8px-monospaced-latin';
-    font-stretch: normal;
-    font-style: normal;
-    font-weight: normal;
-    src: url(./fusion-pixel-8px-monospaced-latin.woff2) format("woff2");
-}
-
-@font-face {
-    font-family: 'fusion-pixel-10px-monospaced-latin';
-    font-stretch: normal;
-    font-style: normal;
-    font-weight: normal;
-    src: url(./fusion-pixel-10px-monospaced-latin.woff2) format("woff2");
-}
-
-@font-face {
-    font-family: 'fusion-pixel-12px-monospaced-latin';
-    font-stretch: normal;
-    font-style: normal;
-    font-weight: normal;
-    src: url(./fusion-pixel-12px-monospaced-latin.woff2) format("woff2");
-}
-
 /* Global */
 html, body {
     padding: 0;

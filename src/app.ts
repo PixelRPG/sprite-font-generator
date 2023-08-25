@@ -1,11 +1,10 @@
-import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color, KeyEvent, Keys, FontOptions, GraphicOptions, RasterOptions } from 'excalibur';
+import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color } from 'excalibur';
 import { waitForFontLoad } from './utils';
-import { addHTMLTextFonts } from './html';
+import { addFontPreviews, initDownloadButton, initFontSelect, saveCanvasAsPNG } from './html';
 import { getUnicodeStringByNames } from './unicode';
+import type { FontOptions } from './types';
 
 const loader = new Loader([]);
-
-console.log("getUnicodeCharacterListByName", );
 
 const unicodeText = getUnicodeStringByNames(['Basic Latin', 'Latin-1 Supplement'], 10);
 
@@ -13,14 +12,17 @@ const engine = new Engine({
   antialiasing: false,
   snapToPixel: false,
   suppressPlayButton: true,
-  backgroundColor: Color.White,
+  backgroundColor: Color.Transparent,
   displayMode: DisplayMode.Fixed,
   width: 600,
   height: 800,
   canvasElementId: 'canvas',
 });
 
-const baseFontOptions: FontOptions & GraphicOptions & RasterOptions = {
+// Without that the download button will not work
+engine.useCanvas2DFallback();
+
+const baseFontOptions: FontOptions = {
   unit: FontUnit.Px,
   quality: 1,
   padding: 0, // for rounding errors?
@@ -47,21 +49,6 @@ const fonts: FontOptions[] = [
     size: 16,
     family: 'ark-pixel-16px-monospaced-latin',
   },
-  // Fusion Pixel
-
-  // 8px to small?
-  // {
-  //   size: 8,
-  //   family: 'fusion-pixel-8px-monospaced-latin',
-  // },
-  {
-    size: 10,
-    family: 'fusion-pixel-10px-monospaced-latin',
-  },
-  {
-    size: 12,
-    family: 'fusion-pixel-12px-monospaced-latin',
-  },
 ];
 
 const texts: Text[] = [];
@@ -73,14 +60,10 @@ for (const fontData of fonts) {
       ...baseFontOptions,
       ...fontData,
     }),
-    // maxWidth: engine.drawWidth,
   }));
 }
 
-const actor = new ScreenElement({
-  // width: engine.drawWidth,
-  // height: engine.drawHeight,
-});
+const actor = new ScreenElement({});
 
 for (const text of texts) {
   const size = (text.font as Font).size
@@ -89,7 +72,17 @@ for (const text of texts) {
   actor.graphics.add(family, text);
 }
 
-let activeFontIndex = -1;
+let activeFontIndex = 0;
+
+const setFixedScreenSize = (width: number, height: number) => {
+  engine.screen.viewport.width = width;
+  engine.screen.viewport.height = height;
+
+  engine.screen.resolution.width = width;
+  engine.screen.resolution.height = height;
+
+  engine.screen.applyResolutionAndViewport()
+}
 
 const switchFont = (index: number) => {
   if (index < 0 || index >= texts.length) {
@@ -105,57 +98,45 @@ const switchFont = (index: number) => {
   const width = actor.graphics.getGraphic(family)?.width ?? 0;
   const height = actor.graphics.getGraphic(family)?.height ?? 0;
 
-  console.debug('width', width);
-  console.debug('height', height);
+  setFixedScreenSize(width, height);
 
-  engine.screen.viewport.width = width;
-  engine.screen.viewport.height = height;
-
-  engine.screen.resolution.width = width;
-  engine.screen.resolution.height = height;
-
-  engine.screen.applyResolutionAndViewport()
-
+  activeFontIndex = index;
 }
 
-const nextFont = () => {
-  ++activeFontIndex;
-  if (activeFontIndex >= texts.length) {
-    activeFontIndex = 0;
-  }
-  switchFont(activeFontIndex);
-}
+// const nextFont = () => {
+//   ++activeFontIndex;
+//   if (activeFontIndex >= texts.length) {
+//     activeFontIndex = 0;
+//   }
+//   switchFont(activeFontIndex);
+// }
 
-const prevFont = () => {
-  --activeFontIndex;
-  if (activeFontIndex < 0) {
-    activeFontIndex = texts.length - 1;
-  }
-  switchFont(activeFontIndex);
-}
+// const prevFont = () => {
+//   --activeFontIndex;
+//   if (activeFontIndex < 0) {
+//     activeFontIndex = texts.length - 1;
+//   }
+//   switchFont(activeFontIndex);
+// }
 
-nextFont();
+switchFont(0);
 
 engine.add(actor);
 
-engine.input.keyboard.on("release", (evt: KeyEvent) => {
-  switch (evt.key) {
-    case Keys.F1:
-      engine.toggleDebug();
-      break;
-    case Keys.ArrowRight:
-      nextFont();
-      break;
-    case Keys.ArrowLeft:
-      prevFont();
-      break;
-    default:
-      break;
-  }
+// Add HTML text fonts
+addFontPreviews(fonts);
+
+initDownloadButton(engine, () => {
+  const family = (texts[activeFontIndex].font as Font).family;
+  saveCanvasAsPNG(engine.canvas, `${family}.png`);
 });
 
-// Add HTML text fonts
-addHTMLTextFonts(unicodeText, texts);
+initFontSelect(fonts, (font: string) => {
+  const index = texts.findIndex((text) => {
+    return (text.font as Font).family  === font;
+  });
+  switchFont(index);
+});
 
 // Start canvas renderer
 await engine.start(loader)
