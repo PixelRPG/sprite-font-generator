@@ -4,6 +4,7 @@ import type { FontOptions } from './types';
 const DOWNLOAD_BUTTON_ID = 'download-button';
 const SECTION_HTML_ID = 'section-html';
 const FONT_SELECT_ID = 'font-select';
+const CODE_CHARSET_ID = 'code-charset';
 
 const sectionEl = document.getElementById(SECTION_HTML_ID);
 
@@ -23,7 +24,15 @@ export const addFontPreviews = (fonts: FontOptions[]) => {
     }
 }
 
-export function saveCanvasAsPNG(canvas: HTMLCanvasElement, filename: string) {
+export const setCodeCharset = (code: string) => {
+    const codeCharsetEl = document.getElementById(CODE_CHARSET_ID);
+    if(!codeCharsetEl) {
+        return;
+    }
+    codeCharsetEl.innerText = code;
+}
+
+export const saveCanvasAsPNG = (canvas: HTMLCanvasElement, filename: string) => {
     let link = document.createElement('a');
     link.download = filename;
     link.href = canvas.toDataURL("image/png;base64");
@@ -62,4 +71,26 @@ export const initFontSelect = (fonts: FontOptions[], onChange: (font: string) =>
         const font = (evt.target as HTMLSelectElement).value;
         onChange(font);
     });
+}
+
+export const waitForFontLoad = async (font: string, timeout = 2000, interval = 100) => {
+    return new Promise((resolve, reject) => {
+        const poller = setInterval(async () => {
+        try {
+            console.debug('Load font', font);
+            await document.fonts.load(font);
+        } catch (err) {
+            reject(err);
+        }
+        if (document.fonts.check(font)) {
+            clearInterval(poller);
+            resolve(true);
+        }
+        }, interval);
+        setTimeout(() => clearInterval(poller), timeout);
+    });
+}
+
+export const replaceBreaksWithHtml = (input: string) => {
+    return input.replace(/\n/g, '<br>');
 }

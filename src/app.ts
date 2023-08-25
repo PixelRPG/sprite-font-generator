@@ -1,6 +1,5 @@
 import { Engine, Text, Font, FontUnit, FontStyle, TextAlign, BaseAlign, Direction, ScreenElement, DisplayMode, Loader, Color } from 'excalibur';
-import { waitForFontLoad } from './utils';
-import { addFontPreviews, initDownloadButton, initFontSelect, saveCanvasAsPNG } from './html';
+import { addFontPreviews, initDownloadButton, initFontSelect, saveCanvasAsPNG, setCodeCharset, waitForFontLoad } from './html';
 import { getUnicodeStringByNames } from './unicode';
 import type { FontOptions } from './types';
 
@@ -103,28 +102,14 @@ const switchFont = (index: number) => {
   activeFontIndex = index;
 }
 
-// const nextFont = () => {
-//   ++activeFontIndex;
-//   if (activeFontIndex >= texts.length) {
-//     activeFontIndex = 0;
-//   }
-//   switchFont(activeFontIndex);
-// }
-
-// const prevFont = () => {
-//   --activeFontIndex;
-//   if (activeFontIndex < 0) {
-//     activeFontIndex = texts.length - 1;
-//   }
-//   switchFont(activeFontIndex);
-// }
-
 switchFont(0);
 
 engine.add(actor);
 
 // Add HTML text fonts
 addFontPreviews(fonts);
+
+setCodeCharset(unicodeText);
 
 initDownloadButton(engine, () => {
   const family = (texts[activeFontIndex].font as Font).family;

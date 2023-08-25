@@ -186,15 +186,18 @@ export const unicodeBlocks: UnicodeBlock[] = [
 
 export const unicodeNonCharPoints: UnicodeBlock[] = [
 	{ begin: 0x0000, end: 0x001f, name: 'Basic Latin Controls' },
-    { begin: 0x007f, end: 0x007f, name: 'Basic Latin Delete'},
+    { begin: 0x007f, end: 0x007f, name: 'Delete'},
 	{ begin: 0x0080, end: 0x009f, name: 'Latin-1 Supplement Controls' },
+    { begin: 0x00ad, end: 0x00ad, name: 'Soft Hyphen (SHY)' },
 ];
 
 export const doubleWidthUnicodeBlocks: UnicodeBlock[] = [
     { begin: 0x00bc, end: 0x00be, name: 'Latin-1 Supplement Fraction' },
+    { begin: 0x00a9, end: 0x00a9, name: 'Latin-1 Supplement Copyright' },
+    { begin: 0x00ae, end: 0x00ae, name: 'Latin-1 Supplement Registered Sign' },
 ]
 
-export function getUnicodeBlockByName(name: string) {
+export const getUnicodeBlockByName = (name: string) => {
 	for (let b = 0; b < unicodeBlocks.length; b++) {
 		if (unicodeBlocks[b].name === name) {
 			return unicodeBlocks[b];
@@ -203,7 +206,10 @@ export function getUnicodeBlockByName(name: string) {
 	return false;
 }
 
-export function isControlChar(char: number) {
+export const isControlChar = (char: number | string) => {
+    if (typeof char === 'string') {
+        char = charToUnicode(char);
+    }
 	for (let r = 0; r < unicodeNonCharPoints.length; r++) {
 		if (isCharInRange(char, unicodeNonCharPoints[r])) {
 			return true;
@@ -213,7 +219,10 @@ export function isControlChar(char: number) {
 	return false;
 }
 
-export function mayDoubleSpace(char: number) {
+export const mayDoubleSpace = (char: number | string) => {
+    if (typeof char === 'string') {
+        char = char.charCodeAt(0);
+    }
 	for (let r = 0; r < doubleWidthUnicodeBlocks.length; r++) {
 		if (isCharInRange(char, doubleWidthUnicodeBlocks[r])) {
 			return true;
@@ -224,13 +233,19 @@ export function mayDoubleSpace(char: number) {
 }
 
 
-export function isCharInRange(char: number, range: UnicodeBlock) {
+export const isCharInRange = (char: number | string, range: UnicodeBlock) => {
+    if (typeof char === 'string') {
+        char = char.charCodeAt(0);
+    }
 	if (isNaN(char)) return false;
 	let result = char <= range.end && char >= range.begin;
 	return result;
 }
 
-export function getParentRange(char: number) {
+export const getParentRange = (char: number | string) => {
+    if (typeof char === 'string') {
+        char = char.charCodeAt(0);
+    }
 	for (let b = 0; b < unicodeBlocks.length; b++) {
 		if (char <= unicodeBlocks[b].end && char >= unicodeBlocks[b].begin) {
 			return unicodeBlocks[b];
@@ -239,7 +254,7 @@ export function getParentRange(char: number) {
 	return false;
 }
 
-export function getUnicodeListByName(name: string, excludeNonChars = true, excludeDoubleWidthChars = true) {
+export const getUnicodeListByName = (name: string, excludeNonChars = true, excludeDoubleSpaceChars = true) => {
     const block = getUnicodeBlockByName(name);
     if (!block) {
         return [];
@@ -249,7 +264,7 @@ export function getUnicodeListByName(name: string, excludeNonChars = true, exclu
         if(excludeNonChars && isControlChar(i)) {
             continue;
         }
-        if(excludeDoubleWidthChars && mayDoubleSpace(i)) {
+        if(excludeDoubleSpaceChars && mayDoubleSpace(i)) {
             continue;
         }
         list.push(i);
@@ -257,21 +272,21 @@ export function getUnicodeListByName(name: string, excludeNonChars = true, exclu
     return list;
 }
 
-export function getUnicodeCharacterListByName(name: string, excludeNonChars = true, excludeDoubleWidthChars = true) {
-    const list = getUnicodeListByName(name, excludeNonChars, excludeDoubleWidthChars);
+export const getUnicodeCharacterListByName = (name: string, excludeNonChars = true, excludeDoubleSpaceChars = true) => {
+    const list = getUnicodeListByName(name, excludeNonChars, excludeDoubleSpaceChars);
     return list.map((code) => String.fromCodePoint(code));
 }
 
-export function getUnicodeCharacterListByNames(names: string[], excludeNonChars = true, excludeDoubleWidthChars = true) {
+export const getUnicodeCharacterListByNames = (names: string[], excludeNonChars = true, excludeDoubleSpaceChars = true) => {
     const list: string[] = [];
     for (const name of names) {
-        list.push(...getUnicodeCharacterListByName(name, excludeNonChars, excludeDoubleWidthChars));
+        list.push(...getUnicodeCharacterListByName(name, excludeNonChars, excludeDoubleSpaceChars));
     }
     return list
 }
 
-export function getUnicodeStringByNames(names: string[], lines: number, excludeNonChars = true, excludeDoubleWidthChars = true) {
-    let str = getUnicodeCharacterListByNames(names, excludeNonChars).join('');
+export const getUnicodeStringByNames = (names: string[], lines: number, excludeNonChars = true, excludeDoubleSpaceChars = true) => {
+    let str = getUnicodeCharacterListByNames(names, excludeNonChars, excludeDoubleSpaceChars).join('');
 
     if(lines) {
         str = distributeText(str, lines)
@@ -280,7 +295,7 @@ export function getUnicodeStringByNames(names: string[], lines: number, excludeN
     return str;
 }
 
-function distributeText(text: string, lines = 6) {
+const distributeText = (text: string, lines: number) => {
     const avgLength = Math.ceil(text.length / lines);
     let remainingText = text;
     let result = '';
@@ -292,4 +307,15 @@ function distributeText(text: string, lines = 6) {
 
     result += remainingText;
     return result;
+}
+
+export const charToUnicode = (char: string) => {
+    let unicodeValue = char.charCodeAt(0);
+    let hexString = unicodeValue.toString(16).toUpperCase();
+    
+    while (hexString.length < 4) {
+        hexString = '0' + hexString;
+    }
+
+    return "0x" + hexString;
 }
